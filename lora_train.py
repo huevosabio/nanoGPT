@@ -193,7 +193,7 @@ if block_size < model.config.block_size:
     model.crop_block_size(block_size)
     model_args['block_size'] = block_size # so that the checkpoint will have the right value
 # set only lora as trainable
-lora.mark_only_lora_as_trainable(model)
+lora.mark_only_lora_as_trainable(model, bias='lora_only')
 model.to(device)
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
