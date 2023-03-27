@@ -1,0 +1,6 @@
+data/*/*.txt
+*.bin
+*.pkl
+out-*/
+wandb/
+__pycache__/
