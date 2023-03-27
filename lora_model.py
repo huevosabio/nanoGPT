@@ -272,7 +272,7 @@ class GPT(nn.Module):
         for k in sd_keys_hf:
             if any(k.endswith(w) for w in transposed):
                 # special treatment for the Conv1D weights we need to transpose
-                assert sd_hf[k].shape[::-1] == sd[k].shape
+                assert sd_hf[k].shape[::-1] == sd[k].shape, f"mismatched shapes for {k}: {sd_hf[k].shape[::-1]} != {sd[k].shape}"
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k].t())
             else:
