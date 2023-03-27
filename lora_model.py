@@ -311,6 +311,9 @@ class GPT(nn.Module):
                 elif pn.endswith('weight') and isinstance(m, blacklist_weight_modules):
                     # weights of blacklist modules will NOT be weight decayed
                     no_decay.add(fpn)
+                elif pn.endswith('lora_A') or pn.endswith('lora_B'):
+                    # weights of LoRA will be weight decayed
+                    decay.add(fpn)
 
         # subtle: 'transformer.wte.weight' and 'lm_head.weight' are tied, so they
         # will appear in the no_decay and decay sets respectively after the above.
