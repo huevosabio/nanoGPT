@@ -196,7 +196,7 @@ if block_size < model.config.block_size:
 # set only lora as trainable
 lora.mark_only_lora_as_trainable(model, bias='lora_only')
 model.to(device)
-print("number of parameters: %.2fM" % (model.get_num_params()/1e6,))
+print("number of parameters: %.2fM" % (model.get_num_params(non_embedding=False)/1e6,))
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
