@@ -74,6 +74,7 @@ dtype = 'bfloat16' # 'float32', 'bfloat16', or 'float16', the latter will auto i
 compile = True # use PyTorch 2.0 to compile the model to be faster
 # LORA settings
 lora_attn_dim = 0
+lora_mlp_dim = 0
 lora_attn_alpha = 1
 lora_dropout = 0.0
 # -----------------------------------------------------------------------------
@@ -195,6 +196,7 @@ if block_size < model.config.block_size:
 # set only lora as trainable
 lora.mark_only_lora_as_trainable(model, bias='lora_only')
 model.to(device)
+print("number of parameters: %.2fM" % (model.get_num_params()/1e6,))
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))

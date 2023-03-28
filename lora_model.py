@@ -48,7 +48,7 @@ class CausalSelfAttention(nn.Module):
             r=config.lora_attn_dim, 
             lora_alpha=config.lora_attn_alpha, 
             lora_dropout=config.lora_dropout, 
-            enable_lora=[True, False, True], 
+            enable_lora=[True, True, True], 
             fan_in_fan_out=False,
             merge_weights=False,
             bias=config.bias
