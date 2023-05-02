@@ -28,14 +28,13 @@ class SVDLinear(nn.Module):
         
         # Perform SVD decomposition on the provided weight matrix
         U, S, V = torch.svd(weight_matrix)
-        self.U = nn.Parameter(U, requires_grad=False)
+        self.register_buffer("U", U)
         self.S = nn.Parameter(S)
-        self.V = nn.Parameter(V, requires_grad=False)
+        self.register_buffer("V", V)
 
         # to keep track of zeroed indices
-        self.active_mask = nn.Parameter(
-            torch.Tensor([True for _ in range(len(self.S))]).bool(),
-            requires_grad=False
+        self.register_buffer(
+            "active_mask", torch.Tensor([True for _ in range(len(self.S))]).bool()
         )
         
         if bias is not None:

@@ -39,6 +39,7 @@ from deco_model import (
     configure_optimizers
 )
 from pruner import Pruner
+from fvcore.nn import FlopCountAnalysis
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
@@ -218,6 +219,7 @@ if ddp:
 raw_model = model.module if ddp else model # unwrap DDP container if needed
 
 # helps estimate an arbitrarily accurate loss over either split using many batches
+# adding flops here for funzies
 @torch.no_grad()
 def estimate_loss():
     out = {}
@@ -229,7 +231,12 @@ def estimate_loss():
             with ctx:
                 logits, loss = model(X, Y)
             losses[k] = loss.item()
+            if k == 0 and split == 'train':
+                # compute flops on first batch
+                model_flops = FlopCountAnalysis(raw_model, X)
+                flops = model_flops.total() / batch_size
         out[split] = losses.mean()
+        out['flops'] = flops
     model.train()
     return out
 
@@ -268,6 +275,8 @@ if master_process:
         total_step=max_iters,
         mask_param_name=pruning_params
     )
+    threshold = prune_initial_threshold
+    mask_threshold = 0.0
 
 # training loop
 X, Y = get_batch('train') # fetch the very first batch
@@ -294,7 +303,7 @@ while True:
                 "mfu": running_mfu*100, # convert to percentage
                 "threshold": threshold,
                 "mask_threshold": mask_threshold,
-                # add flops here
+                "flops": losses['flops'],
             })
         if losses['val'] < best_val_loss or always_save_checkpoint:
             best_val_loss = losses['val']
@@ -337,19 +346,10 @@ while True:
     # prune model in master process and sync
     if iter_num % prune_interval == 0 and iter_num > 0:
         if master_process:
+            # this should update the buffers in the model
+            # and these should be propagated on the next forward pass
             threshold, mask_threshold = PLATON.update_and_pruning(raw_model, iter_num)
             update_masks(raw_model)
-        if ddp:
-            # Sync params and buffers.
-            _sync_module_states(
-                module=model.module,
-                process_group=model.process_group,
-                broadcast_bucket_size=model.broadcast_bucket_size,
-                src=0,
-                params_and_buffers_to_ignore=model.parameters_to_ignore,
-            )
-            # set barrier here to make sure all processes are in sync
-            dist.monitored_barrier()
     # flush the gradients as soon as we can, no need for this memory anymore
     optimizer.zero_grad(set_to_none=True)
 
