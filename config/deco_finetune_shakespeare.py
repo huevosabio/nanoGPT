@@ -31,4 +31,6 @@ prune_final_threshold = 0.05
 prune_beta1 = 0.85
 prune_beta2 = 0.95
 prune_deltaT = 10
-pruner_initial_warmup = 100
+pruner_warmup_steps = 10
+pruner_initial_warmup = 1
+pruner_final_warmup = 5
