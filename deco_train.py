@@ -41,8 +41,6 @@ from deco_model import (
 from pruner import Pruner
 from fvcore.nn import FlopCountAnalysis
 
-# delete after running
-torch._dynamo.config.suppress_errors = True
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
@@ -236,10 +234,10 @@ def estimate_loss():
             losses[k] = loss.item()
             if k == 0 and split == 'train':
                 # compute flops on first batch
-                model_flops = FlopCountAnalysis(raw_model, X)
-                flops = model_flops.total() / batch_size
+                #model_flops = FlopCountAnalysis(raw_model, X)
+                #flops = model_flops.total() / batch_size
         out[split] = losses.mean()
-        out['flops'] = flops
+        out['flops'] = 0# flops
     model.train()
     return out
 
