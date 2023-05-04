@@ -40,6 +40,9 @@ from deco_model import (
 )
 from pruner import Pruner
 from fvcore.nn import FlopCountAnalysis
+
+# delete after running
+torch._dynamo.config.suppress_errors = True
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
