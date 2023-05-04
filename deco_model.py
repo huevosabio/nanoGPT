@@ -85,14 +85,14 @@ def replace_linear_with_svd(module, exceptions=()):
 
 def drop_zeroed_columns(module):
     for name, child in module.named_children():
-        if isinstance(child, nn.SVDLinear):
+        if isinstance(child, SVDLinear):
             child._remove_zeroed_columns()
         else:
             drop_zeroed_columns(child)
 
 def update_masks(module):
     for mn, m in module.named_modules():
-        if isinstance(m, nn.SVDLinear):
+        if isinstance(m, SVDLinear):
             m.update_mask()
 
 def configure_optimizers(module, weight_decay, learning_rate, betas, device_type):
