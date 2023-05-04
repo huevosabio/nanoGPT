@@ -21,6 +21,7 @@ import time
 import math
 import pickle
 from contextlib import nullcontext
+from collections import namedtuple
 
 import numpy as np
 import torch
@@ -268,10 +269,11 @@ if master_process:
         'beta2': prune_beta2,
         'deltaT': prune_deltaT,
     }
+    args = namedtuple('Args', pruner_args.keys())(*pruner_args.values())
     pruning_params = [n for n, p in raw_model.named_parameters() if n.endswith('.S') and p.requires_grad]
     PLATON = Pruner(
         raw_model,
-        args=pruner_args,
+        args=args,
         total_step=max_iters,
         mask_param_name=pruning_params
     )
