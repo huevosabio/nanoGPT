@@ -275,9 +275,9 @@ if master_process:
         'beta2': prune_beta2,
         'deltaT': prune_deltaT,
         'initial_warmup': pruner_initial_warmup,
-        'pruner_initial_warmup': pruner_initial_warmup,
-        'pruner_warmup_steps': pruner_warmup_steps,
-        'pruner_final_warmup':  pruner_final_warmup,
+        'initial_warmup': pruner_initial_warmup,
+        'warmup_steps': pruner_warmup_steps,
+        'final_warmup':  pruner_final_warmup,
     }
     args = Struct(**pruner_args)
     pruning_params = [n for n, p in raw_model.named_parameters() if n.endswith('.S') and p.requires_grad]
