@@ -91,6 +91,7 @@ prune_final_threshold = 0.05
 prune_beta1 = 0.85
 prune_beta2 = 0.95
 prune_deltaT = 10
+pruner_initial_warmup = 100
 # -----------------------------------------------------------------------------
 config_keys = [k for k,v in globals().items() if not k.startswith('_') and isinstance(v, (int, float, bool, str))]
 exec(open('configurator.py').read()) # overrides from command line or config file
@@ -271,6 +272,7 @@ if master_process:
         'beta1': prune_beta1,
         'beta2': prune_beta2,
         'deltaT': prune_deltaT,
+        'initial_warmup': pruner_initial_warmup,
     }
     args = Struct(**pruner_args)
     pruning_params = [n for n, p in raw_model.named_parameters() if n.endswith('.S') and p.requires_grad]
