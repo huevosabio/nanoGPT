@@ -21,7 +21,6 @@ import time
 import math
 import pickle
 from contextlib import nullcontext
-from collections import namedtuple
 
 import numpy as np
 import torch
@@ -261,6 +260,9 @@ if wandb_log and master_process:
     wandb.init(project=wandb_project, name=wandb_run_name, config=config)
 
 # initialize pruner
+class Struct:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
 if master_process:
     pruner_args = {
         'initial_threshold': prune_initial_threshold,
@@ -269,7 +271,7 @@ if master_process:
         'beta2': prune_beta2,
         'deltaT': prune_deltaT,
     }
-    args = namedtuple('Args', pruner_args.keys())(*pruner_args.values())
+    args = Struct(**pruner_args)
     pruning_params = [n for n, p in raw_model.named_parameters() if n.endswith('.S') and p.requires_grad]
     PLATON = Pruner(
         raw_model,
