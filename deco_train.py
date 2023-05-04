@@ -235,12 +235,13 @@ def estimate_loss():
             with ctx:
                 logits, loss = model(X, Y)
             losses[k] = loss.item()
-            #if k == 0 and split == 'train':
+            if k == 0 and split == 'train':
                 # compute flops on first batch
-                #model_flops = FlopCountAnalysis(raw_model, X)
-                #flops = model_flops.total() / batch_size
+                # note that we need to use the unoptimized model here
+                model_flops = FlopCountAnalysis(unoptimized_model, X)
+                flops = model_flops.total() / batch_size
         out[split] = losses.mean()
-        out['flops'] = 0# flops
+        out['flops'] = flops
     model.train()
     return out
 
