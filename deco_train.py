@@ -228,6 +228,7 @@ raw_model = model.module if ddp else model # unwrap DDP container if needed
 def estimate_loss():
     out = {}
     model.eval()
+    unoptimized_model.eval()
     for split in ['train', 'val']:
         losses = torch.zeros(eval_iters)
         for k in range(eval_iters):
@@ -242,6 +243,7 @@ def estimate_loss():
                 flops = model_flops.total() / batch_size
         out[split] = losses.mean()
         out['flops'] = flops
+    unoptimized_model.train()
     model.train()
     return out
 
@@ -357,12 +359,11 @@ while True:
     scaler.step(optimizer)
     scaler.update()
     # prune model in master process and sync
-    if iter_num % prune_interval == 0 and iter_num > 0:
-        if master_process:
-            # this should update the buffers in the model
-            # and these should be propagated on the next forward pass
-            threshold, mask_threshold = PLATON.update_and_pruning(raw_model, iter_num)
-            update_masks(raw_model)
+    if master_process:
+        # this should update the buffers in the model
+        # and these should be propagated on the next forward pass
+        threshold, mask_threshold = PLATON.update_and_pruning(raw_model, iter_num)
+        update_masks(raw_model)
     # flush the gradients as soon as we can, no need for this memory anymore
     optimizer.zero_grad(set_to_none=True)
 

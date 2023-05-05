@@ -21,8 +21,8 @@ gradient_accumulation_steps = 32
 max_iters = 2000
 
 # finetune at constant LR
-learning_rate = 3e-5
-decay_lr = False
+#learning_rate = 3e-5
+#decay_lr = False
 
 # pruning settings
 prune_interval = 10 # how often to prune the model
@@ -31,6 +31,10 @@ prune_final_threshold = 0.05
 prune_beta1 = 0.85
 prune_beta2 = 0.95
 prune_deltaT = 10
-pruner_warmup_steps = 10
+pruner_warmup_steps = 100
 pruner_initial_warmup = 1
 pruner_final_warmup = 5
+
+# inspired on config/train_gpt2.py
+max_iters = 50000
+lr_decay_iters = 50000
